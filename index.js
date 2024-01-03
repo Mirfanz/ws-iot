@@ -38,6 +38,6 @@ mqttClient.on("message", (topic, payload) => {
   io.to(topic).emit("mqtt_message", { topic, message: payload.toString() });
 });
 
-httpServer.listen(5500, () => {
-  console.log("Server Ready at port 5500");
+httpServer.listen(8000, () => {
+  console.log("Server Ready at port 8000");
 });
