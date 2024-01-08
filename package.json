@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.7.1",
     "mosca": "^0.6.0",
     "mqtt": "^5.3.4",
     "socket.io": "^4.7.2"
