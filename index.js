@@ -3,7 +3,7 @@ const http = require("http");
 const mqtt = require("mqtt");
 
 const httpServer = http.createServer((req, res) => {
-  return res.writeHead(200, "okee");
+  return res.writeHead(200, "Websocket Server");
 });
 
 const io = new socketIO.Server(httpServer, {
@@ -38,6 +38,7 @@ mqttClient.on("message", (topic, payload) => {
   io.to(topic).emit("mqtt_message", { topic, message: payload.toString() });
 });
 
-httpServer.listen(8000, () => {
-  console.log("Server Ready at port 8000");
+const port = 8083;
+httpServer.listen(port, () => {
+  console.log("Server Ready at port " + port);
 });
