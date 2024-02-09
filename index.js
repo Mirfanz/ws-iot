@@ -17,14 +17,19 @@ const mqttClient = mqtt.connect("mqtt://free.mqtt.iyoti.id:1883");
 io.on("connection", (socket) => {
   console.log("Connect " + socket.id);
 
-  socket.on("subscribe", (data) => {
-    console.log("subscribe", data);
-    mqttClient.subscribe(data);
-    socket.join(data);
+  socket.on("subscribe", (deviceId) => {
+    const topic = "bytee/" + deviceId;
+    console.log("subscribe", topic);
+
+    mqttClient.subscribe(topic);
+    socket.join(topic);
   });
 
   socket.on("publish", (data) => {
-    mqttClient.publish(data.topic, data.message);
+    const topic = "bytee/" + data.deviceId;
+    mqttClient.publish(topic, data.state ? "1" : "0");
+    socket.emit("mqtt_message", data);
+    socket.to(topic).emit("mqtt_message", data);
   });
 
   socket.on("disconnect", () => {
@@ -32,10 +37,19 @@ io.on("connection", (socket) => {
   });
 });
 
-// mqttClient.subscribe("bytee/6594182a8dffabba4a44d91e");
 mqttClient.on("message", (topic, payload) => {
-  console.log(topic, payload.toString());
-  io.to(topic).emit("mqtt_message", { topic, message: payload.toString() });
+  const message = payload.toString();
+  console.log(topic, message);
+
+  // Cek darimana message bearasal
+  if (message === "on" || message === "off") {
+    // Jika message dari device, Teruskan message ke websocket
+    console.log("Signal Dari Device");
+    io.to(topic).emit("mqtt_message", { topic, message });
+  } else if (message === "0" || message === "1") {
+    // Jika message dari website, Biarin aja karena sudah diteruskan oleh websocket
+    console.log("Signal Dari Website");
+  }
 });
 
 const port = 8083;
